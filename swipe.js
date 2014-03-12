@@ -161,6 +161,7 @@ function Swipe(container, options) {
 
     var slide = slides[index];
     var style = slide && slide.style;
+    var offset;
 
     if (!style) return;
 
@@ -175,6 +176,10 @@ function Swipe(container, options) {
     style.MozTransform =
     style.OTransform = 'translateX(' + dist + 'px)';
 
+    if (options.move) {
+      offset = (width - Math.abs(dist))/width;
+      options.move(index, slides[index], Math.min(Math.max(offset, 0), 1), speed);
+    }
   }
 
   function animate(from, to, speed) {
@@ -334,7 +339,6 @@ function Swipe(container, options) {
           translate(index, delta.x + slidePos[index], 0);
           translate(index+1, delta.x + slidePos[index+1], 0);
         }
-
       }
 
     },
