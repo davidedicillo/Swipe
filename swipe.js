@@ -161,7 +161,6 @@ function Swipe(container, options) {
 
     var slide = slides[index];
     var style = slide && slide.style;
-    var offset;
 
     if (!style) return;
 
@@ -175,11 +174,6 @@ function Swipe(container, options) {
     style.msTransform =
     style.MozTransform =
     style.OTransform = 'translateX(' + dist + 'px)';
-
-    if (options.move) {
-      offset = (width - Math.abs(dist))/width;
-      options.move(index, slides[index], Math.min(Math.max(offset, 0), 1), speed);
-    }
   }
 
   function animate(from, to, speed) {
@@ -215,6 +209,25 @@ function Swipe(container, options) {
 
     }, 4);
 
+  }
+
+  function indexChangingMove(index, dist) {
+    var to = dist > 0 ? index - 1 : index + 1;
+    if (options.continuous) {
+      to = circle(to);
+    }
+    var delta = Math.abs(dist)/width;
+    delta = Math.min(Math.max(delta, 0), 1);
+    indexChanging(index, to, delta, 0);
+  }
+
+  function indexChanging(from, to, delta, delay) {
+    if (from >= slides.length || from < 0 || to >= slides.length || to < 0) {
+      return;
+    }
+    if (options.indexChanging) {
+      options.indexChanging(from, to, delta, delay, slides[from], slides[to]);
+    }
   }
 
   // setup auto slideshow
@@ -338,7 +351,11 @@ function Swipe(container, options) {
           translate(index-1, delta.x + slidePos[index-1], 0);
           translate(index, delta.x + slidePos[index], 0);
           translate(index+1, delta.x + slidePos[index+1], 0);
+
         }
+
+        indexChangingMove(index, delta.x);
+
       }
 
     },
@@ -367,6 +384,8 @@ function Swipe(container, options) {
       if (!isScrolling) {
 
         if (isValidSlide && !isPastBounds) {
+
+          var oldIndex = index;
 
           if (direction) {
 
@@ -399,6 +418,7 @@ function Swipe(container, options) {
 
           }
 
+          indexChanging(oldIndex, index, 1, speed);
           options.callback && options.callback(index, slides[index]);
 
         } else {
@@ -416,6 +436,7 @@ function Swipe(container, options) {
             move(index+1, width, speed);
           }
 
+          indexChanging(direction ? index + 1 : index - 1, index, 1, speed);
         }
 
       }
