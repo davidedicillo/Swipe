@@ -32,6 +32,7 @@ function Swipe(container, options) {
   options = options || {};
   var index = parseInt(options.startSlide, 10) || 0;
   var speed = options.speed || 300;
+  var sortedIndexChanging = options.sortedIndexChanging !== undefined ? options.sortedIndexChanging : false;
   options.continuous = options.continuous !== undefined ? options.continuous : true;
 
   function setup() {
@@ -226,6 +227,12 @@ function Swipe(container, options) {
       return;
     }
     if (options.indexChanging) {
+      if (sortedIndexChanging && (from > to)) {
+        var toTemp = to;
+        to = from;
+        from = toTemp;
+        delta = 1 - delta;
+      }
       options.indexChanging(from, to, delta, delay, slides[from], slides[to]);
     }
   }
