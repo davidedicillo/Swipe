@@ -220,20 +220,19 @@ function Swipe(container, options) {
       to = circle(to);
     }
 
-    // in case the user hasn't hit exactly delta 0 when swiping back and forth
+    // in case the user hasn't hit exactly deltas 0 or 1 when swiping back and forth
     if (prevTo !== null && prevTo !== to) {
       if (dist > 0) {
         indexChanging(index, prevTo, 0, 0);
       } else {
         indexChanging(prevTo, index, 1, 0);
       }
-      prevTo = null;
-    } else {
-      prevTo = to;
     }
 
-    delta = Math.min(Math.max(delta, 0), 1);
-    indexChanging(index, to, delta, 0);
+    delta = Math.abs(dist)/width;
+    indexChanging(index, to, Math.min(Math.max(delta, 0), 1), 0);
+
+    prevTo = to;
   }
 
   function indexChanging(from, to, delta, delay) {
