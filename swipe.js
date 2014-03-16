@@ -33,6 +33,7 @@ function Swipe(container, options) {
   var index = parseInt(options.startSlide, 10) || 0;
   var speed = options.speed || 300;
   var sortedIndexChanging = options.sortedIndexChanging !== undefined ? options.sortedIndexChanging : false;
+  var prevTo;
   options.continuous = options.continuous !== undefined ? options.continuous : true;
 
   function setup() {
@@ -213,11 +214,24 @@ function Swipe(container, options) {
   }
 
   function indexChangingMove(index, dist) {
-    var to = dist > 0 ? index - 1 : index + 1;
+    var delta, to = dist > 0 ? index - 1 : index + 1;
+
     if (options.continuous) {
       to = circle(to);
     }
-    var delta = Math.abs(dist)/width;
+
+    // in case the user hasn't hit exactly delta 0 when swiping back and forth
+    if (prevTo !== null && prevTo !== to) {
+      if (dist > 0) {
+        indexChanging(index, prevTo, 0, 0);
+      } else {
+        indexChanging(prevTo, index, 1, 0);
+      }
+      prevTo = null;
+    } else {
+      prevTo = to;
+    }
+
     delta = Math.min(Math.max(delta, 0), 1);
     indexChanging(index, to, delta, 0);
   }
