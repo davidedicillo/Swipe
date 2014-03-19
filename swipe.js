@@ -148,6 +148,7 @@ function Swipe(container, options) {
       //no fallback for a circular continuous if the browser does not accept transitions
     }
 
+    indexChanging(index, to, 1, slideSpeed || speed);
     index = to;
     offloadFn(options.callback && options.callback(index, slides[index]));
   }
@@ -221,7 +222,7 @@ function Swipe(container, options) {
     }
 
     // in case the user hasn't hit exactly deltas 0 or 1 when swiping back and forth
-    if (prevTo !== null && prevTo !== to) {
+    if (prevTo !== null && prevTo !== to && index !== prevTo) {
       if (dist > 0) {
         indexChanging(index, prevTo, 0, 0);
       } else {
